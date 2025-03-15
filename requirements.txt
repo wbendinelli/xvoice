@@ -1,0 +1,35 @@
+# Core dependencies
+torch==2.0.1  # PyTorch for accelerated computing (CPU/GPU)
+torchaudio==2.0.1  # Audio processing library integrated with PyTorch
+transformers==4.35.0  # Hugging Face library for NLP models, including Whisper
+openai-whisper==20231122  # Official Whisper implementation for transcription
+numpy==1.24.3  # Numerical computing library
+scipy==1.10.1  # Signal processing for noise reduction and filtering
+
+# Natural Language Processing (NLP)
+spacy==3.6.1  # NLP library for text processing
+spacy-langdetect==0.1.2  # Automatic language detection for text
+sentence-transformers==2.2.2  # Sentence embeddings for text analysis
+pandas==2.0.3  # Data manipulation and structured file handling (CSV, JSON)
+
+# Audio Processing
+pydub==0.25.1  # Audio file manipulation and conversion
+ffmpeg-python==0.2.0  # Interface for FFMPEG, essential for audio conversion
+soundfile==0.12.1  # Read and write audio files (WAV, FLAC, etc.)
+librosa==0.10.0  # Audio analysis and feature extraction
+audioread==3.0.1  # Backend for audio file reading
+
+# YouTube Downloading
+yt-dlp==2023.11.16  # Download and extract audio from YouTube videos
+
+# Utility and Logging
+tqdm==4.65.0  # Progress bar for tracking processing status
+loguru==0.7.0  # Advanced logging for error tracking and debugging
+python-dotenv==1.0.0  # Environment variable management
+requests==2.31.0  # HTTP requests handling (if needed in the future)
+
+# Optional Dependencies for GPU Support
+nvidia-pyindex==1.0.9  # NVIDIA package index
+nvidia-cuda-runtime-cu11==11.7.99  # CUDA runtime for GPU acceleration
+nvidia-cublas-cu11==11.10.3.66  # BLAS optimized for CUDA
+nvidia-cudnn-cu11==8.5.0.96  # NVIDIA deep learning library
