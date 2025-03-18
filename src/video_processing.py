@@ -1,7 +1,6 @@
 import os
 import subprocess
 import uuid
-import re
 import json
 
 def get_video_metadata(video_url):
@@ -20,19 +19,21 @@ def get_video_metadata(video_url):
     except Exception:
         return str(uuid.uuid4().hex[:6])  # Generate unique ID if metadata retrieval fails
 
-def download_youtube_audio(video_url, output_dir="./data/raw", processed_urls=set(), index=None):
+def download_youtube_audio(video_url, output_dir="./data/raw", start_time=None, end_time=None, processed_urls=set(), index=None):
     """
-    Downloads the audio from a YouTube video using yt-dlp and converts it to WAV format.
+    Downloads a specific segment of audio from a YouTube video using yt-dlp and converts it to WAV format.
     Ensures unique filenames and avoids reprocessing duplicate URLs.
 
     Parameters:
-    video_url (str): The YouTube video URL.
-    output_dir (str): Directory where the audio file will be saved.
-    processed_urls (set): Set of URLs that have already been processed.
-    index (int): Index of the video in batch processing, assigned dynamically if None.
+    - video_url (str): The YouTube video URL.
+    - output_dir (str): Directory where the audio file will be saved.
+    - start_time (str or None): Start time of the desired segment (e.g., "10:30"). If None, starts from 0.
+    - end_time (str or None): End time of the desired segment (e.g., "15:45"). If None, downloads the rest.
+    - processed_urls (set): Set of URLs that have already been processed.
+    - index (int or None): Index of the video in batch processing, assigned dynamically if None.
 
     Returns:
-    str: Path to the converted WAV file.
+    - str: Path to the extracted WAV file.
     """
     if video_url in processed_urls:
         print(f"[INFO] Skipping duplicate video: {video_url}")
@@ -51,20 +52,31 @@ def download_youtube_audio(video_url, output_dir="./data/raw", processed_urls=se
             print("[INFO] Libraries and dependencies imported successfully.")
 
         video_id = get_video_metadata(video_url)
-        output_filename = f"video_{index:02d}_{video_id}.wav"  # Two-digit numbering
+
+        # Definir nome do arquivo com start_time para identificar trechos diferentes
+        time_suffix = f"_{start_time.replace(':', '')}" if start_time else ""
+        output_filename = f"video_{index:02d}_{video_id}{time_suffix}.wav"
         output_path = os.path.join(output_dir, output_filename)
 
         print(f"[INFO] Processing file {index}...")
 
-        subprocess.run([
+        # Define a seção a ser baixada, se os tempos foram fornecidos
+        yt_dlp_command = [
             "yt-dlp", "-f", "bestaudio", "--extract-audio", "--audio-format", "wav",
             "-o", output_path, video_url
-        ], check=True)
+        ]
+        
+        if start_time and end_time:
+            yt_dlp_command.insert(1, "--download-sections")
+            yt_dlp_command.insert(2, f"*{start_time}-{end_time}")
+
+        # Executa o comando corretamente formatado
+        subprocess.run(yt_dlp_command, check=True)
 
         print(f"[SUCCESS] File {index} processed successfully: {output_path}")
         processed_urls.add(video_url)
         return output_path
 
-    except Exception as e:
+    except subprocess.CalledProcessError as e:
         print(f"[ERROR] Failed to process file {index}: {e}")
         return None
